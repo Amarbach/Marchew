@@ -1,9 +1,0 @@
-﻿  Game.cpp
-  View.cpp
-C:\Users\artux\source\repos\Marchew\Marchew\Marchew\View.cpp(24,20): warning C4244: "inicjowanie": konwersja z "_Rep" do "long", możliwa utrata danych
-          with
-          [
-              _Rep=__int64
-          ]
-  Generowanie kodu...
-  Marchew.vcxproj -> C:\Users\artux\source\repos\Marchew\Marchew\x64\Debug\Marchew.exe
