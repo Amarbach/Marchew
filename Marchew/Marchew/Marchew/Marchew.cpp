@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include "include/glad/glad.h"
 #include "include/GLFW/glfw3.h"
+#include "ShaderProgram.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -41,7 +42,9 @@ int main()
      0.0f,  0.5f, 0.0f
     };
 
-    const char* vertexShaderSource = "#version 330 core\n"
+    ShaderProgram shader("vertex.vs", "fragment.fs");
+
+    /*const char* vertexShaderSource = "#version 330 core\n"
                                      "layout (location = 0) in vec3 aPos;\n"
                                      "void main()\n"
                                      "{\n"
@@ -86,7 +89,9 @@ int main()
     if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
+    }*/
+
+
 
     unsigned int VBO;
     glGenBuffers(1, &VBO);
@@ -102,9 +107,9 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glUseProgram(shaderProgram);
+    /*glUseProgram(shaderProgram);
     glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    glDeleteShader(fragmentShader);*/
 
     glBindVertexArray(VAO);
     
