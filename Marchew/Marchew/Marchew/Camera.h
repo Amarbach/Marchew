@@ -19,5 +19,7 @@ public:
 	glm::mat4 getViewMtx();
 	void translate(glm::vec3 displacement);
 	void translate(float x, float y, float z);
+	void moveForward(float displacement);
+	void moveSide(float displacement);
 };
 

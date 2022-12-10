@@ -2,7 +2,7 @@
 
 Camera::Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up, float fov, float near, float far, float viewPortHeight, float viewPortWidth, ProjectionType type)
 {
-	this->position = position;
+	this->position = pos;
 	this->front = front;
 	this->up = up;
 	this->fov = fov;
@@ -55,4 +55,14 @@ void Camera::translate(float x, float y, float z)
 {
 	glm::vec3 displacement = glm::vec3(x, y, z);
 	this->position += displacement;
+}
+
+void Camera::moveForward(float displacement)
+{
+	this->position += this->front * displacement;
+}
+
+void Camera::moveSide(float displacement)
+{
+	this->position += glm::normalize(glm::cross(this->front, this->up)) * displacement;
 }
