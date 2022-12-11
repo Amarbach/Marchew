@@ -21,5 +21,6 @@ public:
 	void translate(float x, float y, float z);
 	void moveForward(float displacement);
 	void moveSide(float displacement);
+	void moveUp(float displacement);
 };
 

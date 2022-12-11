@@ -9,18 +9,18 @@ class Texture
 private:
 	unsigned int ID;
 	std::string filename;
-	std::string format;
 	unsigned int wrapS;
 	unsigned int wrapT;
 	unsigned int minFilter;
 	unsigned int maxFilter;
 public:
-	Texture(std::string filename, std::string format);
+	Texture(std::string filename);
 	void Load();
 	void setWrapTypeS(unsigned int type);
 	void setWrapTypeT(unsigned int type);
 	void setMinFilter(unsigned int filter);
 	void setMaxFilter(unsigned int filter);
 	void UseOn(unsigned int texUnit);
+	std::string getFilename();
 };
 
