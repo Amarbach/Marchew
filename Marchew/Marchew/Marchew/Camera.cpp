@@ -66,3 +66,8 @@ void Camera::moveSide(float displacement)
 {
 	this->position += glm::normalize(glm::cross(this->front, this->up)) * displacement;
 }
+
+void Camera::moveUp(float displacement)
+{
+	this->position += displacement * this->up;
+}
