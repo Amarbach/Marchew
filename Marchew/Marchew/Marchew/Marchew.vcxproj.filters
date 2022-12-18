@@ -67,5 +67,11 @@
     <None Include="vertex.vs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="sun.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="sun.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

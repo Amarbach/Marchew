@@ -72,6 +72,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExternalIncludePath>include\glad;include\GLFW;include\KHR;include\assimp;$(ExternalIncludePath)</ExternalIncludePath>
+    <IncludePath>C:\Users\ewacz\Documents\StudiaInf\PwAG\Marchew\Marchew\glut-3.7.6-bin\glut-3.7.6-bin;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\ewacz\Documents\StudiaInf\PwAG\Marchew\Marchew\glut-3.7.6-bin\glut-3.7.6-bin;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -149,6 +151,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.fs" />
+    <None Include="sun.fs" />
+    <None Include="sun.vs" />
     <None Include="vertex.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

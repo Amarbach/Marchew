@@ -28,6 +28,12 @@ float lastY = 600.0 / 2.0;
 
 bool toggleWireframe = false;
 
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
+
+
+
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -86,9 +92,15 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
     mainCamera.orient(xoffset, yoffset);
 }
+void drawSun() 
+{
+    //glutSolidSphere(1.25, 100, 100);
+}
 
 int main()
 {
+
+
     //inicjalizacja
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -113,28 +125,52 @@ int main()
     glfwSetKeyCallback(window, key_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    float floor[] = {
+    -2.0f,  0.0f, 2.0f,
+     0.0f,   0.0f, 2.0f,
+     0.0f,  0.0f, 0.0f,
+     -2.0f,  0.0f, 0.0f,
+
+    };
+    unsigned int VBO_1, cubeVAO;
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &VBO_1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_1);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(floor), floor, GL_STATIC_DRAW);
+
+    glBindVertexArray(cubeVAO);
+
+
+
     //ładowanie shaderów
     ShaderProgram shader("vertex.vs", "fragment.fs");
+    ShaderProgram shaderSun("sun.vs", "sun.fs");
 
     //ładowanie zająca
     Model test1("3Ds\\Bunny.obj");
+
+    Model sun("3Ds\\Sun.obj");
+   
+
 
     //ładowanie tekstur i wrzucanie ich do openGL/na kartę graficzną
     Texture tex1("tex1.jpg");
     tex1.Load();
     Texture tex2("tex2.jpg");
     tex2.Load();
+    Texture grass("grass.jpg");
+    grass.Load();
+    Texture sunTex("sun.jpg");
+    sunTex.Load();
 
     
     //włączenie shadera i przekazanie macierzy projekcji
-    shader.use();
-    shader.setMat4("projection", mainCamera.getProjectionMtx());
-    shader.setInt("texture1", 0);
-    shader.setInt("texture2", 1);
+   
     
     //włączenie testu głębi
     glEnable(GL_DEPTH_TEST);
-
+   
     while (!glfwWindowShouldClose(window))
     {
         //sterowanie czasowe i wyznaczanie deltaTime
@@ -148,8 +184,18 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //wrzucenie tekstur na jednostki teksturowe
-        //tex1.UseOn(GL_TEXTURE0);
-        //tex2.UseOn(GL_TEXTURE1);
+        tex1.UseOn(GL_TEXTURE0);
+        tex2.UseOn(GL_TEXTURE1);
+        
+        shader.use();
+        shader.setMat4("projection", mainCamera.getProjectionMtx());
+        shader.setInt("texture1", 0);
+        shader.setInt("texture2", 1);
+        //ustawianie macierzy view kamery(pozycja, rotacja i up)
+        shader.setMat4("view", mainCamera.getViewMtx());
+
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 4);
 
         //wyznaczenie pozycji, rotacji i skali zająca
         float vTime = (float)glfwGetTime();
@@ -159,10 +205,31 @@ int main()
         transform = glm::rotate(transform, vTime, glm::vec3(0.0f, 1.0f, 0.0f));
         transform = glm::scale(transform, glm::vec3(0.1f, 0.1f, 0.1f));
         shader.setMat4("model", transform);
+        //shader.setVec3("x",1.0f, 1.0f, 1.0f);
+
         //rysowanie zająca
         test1.Draw();
-        //ustawianie macierzy view kamery(pozycja, rotacja i up)
-        shader.setMat4("view", mainCamera.getViewMtx());
+
+
+        //sun
+        shaderSun.use();
+        shaderSun.setMat4("projection", mainCamera.getProjectionMtx());
+        shaderSun.setMat4("view", mainCamera.getViewMtx());
+       
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(10.0f, 10.0f, -10.0f));
+        transform = glm::scale(transform, glm::vec3(0.001f, 0.001f, 0.001f));
+        shaderSun.setMat4("model", transform);
+
+        //glBindVertexArray(lightCubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        sunTex.UseOn(GL_TEXTURE0);
+        sunTex.UseOn(GL_TEXTURE1);
+        sun.Draw();
+
+
         
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -171,4 +238,3 @@ int main()
     glfwTerminate();
     return 0;
 }
-

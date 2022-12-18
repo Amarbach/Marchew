@@ -17,6 +17,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+
 class Model
 {
 private:
