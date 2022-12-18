@@ -1,7 +1,32 @@
 ﻿#include <iostream>
+#include <vector>
+
 #include "include/glad/glad.h"
 #include "include/GLFW/glfw3.h"
+#include "include/glm/glm.hpp"
+#include "include/glm/gtc/matrix_transform.hpp"
+#include "include/glm/gtc/type_ptr.hpp"
+
+
+#include "Camera.h"
 #include "ShaderProgram.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "Texture.h"
+#include "Mesh.h"
+#include "Model.h"
+
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
+Camera mainCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f, 0.1f, 100.0f, SCR_HEIGHT, SCR_WIDTH, PERSPECTIVE);
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
+
+bool firstMouse = true;
+float lastX = 800.0f / 2.0;
+float lastY = 600.0 / 2.0;
+
+bool toggleWireframe = false;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -10,18 +35,67 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void processInput(GLFWwindow* window)
 {
-    if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
+    float cameraSpeed = static_cast<float>(2.5 * deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        mainCamera.moveForward(cameraSpeed);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        mainCamera.moveForward(-cameraSpeed);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        mainCamera.moveSide(-cameraSpeed);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        mainCamera.moveSide(cameraSpeed);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        mainCamera.moveUp(cameraSpeed);
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+        mainCamera.moveUp(-cameraSpeed);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
+    {
+        toggleWireframe = !toggleWireframe;
+        if (toggleWireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f; // change this value to your liking
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    mainCamera.orient(xoffset, yoffset);
 }
 
 int main()
 {
+    //inicjalizacja
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Marchew", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Marchew", NULL, NULL);
     if (window == NULL) {
         std::cout << "error\n";
         glfwTerminate();
@@ -33,99 +107,67 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-    glViewport(0, 0, 800, 600);
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-    };
-
+    //ładowanie shaderów
     ShaderProgram shader("vertex.vs", "fragment.fs");
 
-    /*const char* vertexShaderSource = "#version 330 core\n"
-                                     "layout (location = 0) in vec3 aPos;\n"
-                                     "void main()\n"
-                                     "{\n"
-                                     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                     "}\0";
+    //ładowanie zająca
+    Model test1("3Ds\\Bunny.obj");
 
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    //ładowanie tekstur i wrzucanie ich do openGL/na kartę graficzną
+    Texture tex1("tex1.jpg");
+    tex1.Load();
+    Texture tex2("tex2.jpg");
+    tex2.Load();
 
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    int  success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* fragmentShaderSource = "#version 330 core\n"
-                                       "out vec4 FragColor;\n"
-                                       "void main()\n"
-                                       "{\n"
-                                       "    FragColor = vec4(1.0f, 0.1f, 0.1f, 1.0f);\n"
-                                       "}\0";
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }*/
-
-
-
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    /*glUseProgram(shaderProgram);
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);*/
-
-    glBindVertexArray(VAO);
     
+    //włączenie shadera i przekazanie macierzy projekcji
+    shader.use();
+    shader.setMat4("projection", mainCamera.getProjectionMtx());
+    shader.setInt("texture1", 0);
+    shader.setInt("texture2", 1);
+    
+    //włączenie testu głębi
+    glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window))
     {
+        //sterowanie czasowe i wyznaczanie deltaTime
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
         processInput(window);
 
+        //czyszczenie
         glClearColor(0.9f, 0.6f, 0.6f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //wrzucenie tekstur na jednostki teksturowe
+        //tex1.UseOn(GL_TEXTURE0);
+        //tex2.UseOn(GL_TEXTURE1);
+
+        //wyznaczenie pozycji, rotacji i skali zająca
+        float vTime = (float)glfwGetTime();
+        glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        //transform = glm::translate(transform, glm::vec3(0.0f, sin(vTime)/2.0, 0.0f));
+        transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, -1.0f));
+        transform = glm::rotate(transform, vTime, glm::vec3(0.0f, 1.0f, 0.0f));
+        transform = glm::scale(transform, glm::vec3(0.1f, 0.1f, 0.1f));
+        shader.setMat4("model", transform);
+        //rysowanie zająca
+        test1.Draw();
+        //ustawianie macierzy view kamery(pozycja, rotacja i up)
+        shader.setMat4("view", mainCamera.getViewMtx());
         
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
     glfwTerminate();
     return 0;
 }
