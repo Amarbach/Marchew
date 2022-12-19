@@ -125,23 +125,21 @@ int main()
     glfwSetKeyCallback(window, key_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    float floor[] = {
-    -2.0f,  0.0f, 2.0f,
-     0.0f,   0.0f, 2.0f,
-     0.0f,  0.0f, 0.0f,
-     -2.0f,  0.0f, 0.0f,
-
-    };
-    unsigned int VBO_1, cubeVAO;
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &VBO_1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_1);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(floor), floor, GL_STATIC_DRAW);
-
-    glBindVertexArray(cubeVAO);
-
-
+    std::vector<Vertex> floor;
+    floor.push_back({ glm::vec3(-2.0f,  0.0f, 2.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f) });
+    floor.push_back({ glm::vec3(0.0f,   0.0f, 2.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f) });
+    floor.push_back({ glm::vec3(0.0f,  0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f) });
+    floor.push_back({ glm::vec3(-2.0f,  0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f) });
+    std::vector<unsigned int> indices;
+    indices.push_back(3);
+    indices.push_back(0);
+    indices.push_back(1);
+    indices.push_back(1);
+    indices.push_back(2);
+    indices.push_back(3);
+    std::vector<Texture> texs;
+    Mesh ground(floor, indices, texs);
+    ground.Load();
 
     //ładowanie shaderów
     ShaderProgram shader("vertex.vs", "fragment.fs");
@@ -194,8 +192,9 @@ int main()
         //ustawianie macierzy view kamery(pozycja, rotacja i up)
         shader.setMat4("view", mainCamera.getViewMtx());
 
-        glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 4);
+        
+        //glBindVertexArray(cubeVAO);
+        //glDrawArrays(GL_TRIANGLES, 0, 4);
 
         //wyznaczenie pozycji, rotacji i skali zająca
         float vTime = (float)glfwGetTime();
@@ -209,7 +208,9 @@ int main()
 
         //rysowanie zająca
         test1.Draw();
-
+        transform = glm::mat4(1.0f);
+        shader.setMat4("model", transform);
+        ground.Draw();
 
         //sun
         shaderSun.use();
