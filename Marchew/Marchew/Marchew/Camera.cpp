@@ -71,3 +71,8 @@ void Camera::moveUp(float displacement)
 {
 	this->position += displacement * this->up;
 }
+
+glm::vec3 Camera::getPosition()
+{
+	return this->position;
+}

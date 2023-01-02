@@ -28,11 +28,6 @@ float lastY = 600.0 / 2.0;
 
 bool toggleWireframe = false;
 
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-
-
-
-
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -99,8 +94,6 @@ void drawSun()
 
 int main()
 {
-
-
     //inicjalizacja
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -143,6 +136,7 @@ int main()
 
     //ładowanie shaderów
     ShaderProgram shader("vertex.vs", "fragment.fs");
+    ShaderProgram phong("phong1.vs", "phong1.fs");
     ShaderProgram shaderSun("sun.vs", "sun.fs");
 
     //ładowanie zająca
@@ -163,11 +157,11 @@ int main()
     sunTex.Load();
 
     
-    //włączenie shadera i przekazanie macierzy projekcji
-   
     
     //włączenie testu głębi
     glEnable(GL_DEPTH_TEST);
+
+    glm::vec3 lightPos;
    
     while (!glfwWindowShouldClose(window))
     {
@@ -176,40 +170,40 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         processInput(window);
+        float vTime = (float)(glfwGetTime())/10.0f;
+        lightPos = glm::vec3(10.0f * cos(vTime), 10.0f * sin(vTime), -10.0f);
 
         //czyszczenie
-        glClearColor(0.9f, 0.6f, 0.6f, 1.0f);
+        glClearColor(0.1f, 0.3f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //wrzucenie tekstur na jednostki teksturowe
         tex1.UseOn(GL_TEXTURE0);
-        tex2.UseOn(GL_TEXTURE1);
         
-        shader.use();
-        shader.setMat4("projection", mainCamera.getProjectionMtx());
-        shader.setInt("texture1", 0);
-        shader.setInt("texture2", 1);
+        //włączenie shadera i przekazanie macierzy projekcji, koloru światła, pozycji światła i pozycji obserwatora
+        phong.use();
+        phong.setMat4("projection", mainCamera.getProjectionMtx());
+        phong.setInt("texture1", 0);
+        phong.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        phong.setVec3("lightPos", lightPos);
+        phong.setVec3("viewPos", mainCamera.getPosition());
         //ustawianie macierzy view kamery(pozycja, rotacja i up)
-        shader.setMat4("view", mainCamera.getViewMtx());
-
-        
-        //glBindVertexArray(cubeVAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 4);
+        phong.setMat4("view", mainCamera.getViewMtx());
 
         //wyznaczenie pozycji, rotacji i skali zająca
-        float vTime = (float)glfwGetTime();
+        
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         //transform = glm::translate(transform, glm::vec3(0.0f, sin(vTime)/2.0, 0.0f));
         transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, -1.0f));
-        transform = glm::rotate(transform, vTime, glm::vec3(0.0f, 1.0f, 0.0f));
+        //transform = glm::rotate(transform, vTime, glm::vec3(0.0f, 1.0f, 0.0f));
         transform = glm::scale(transform, glm::vec3(0.1f, 0.1f, 0.1f));
-        shader.setMat4("model", transform);
-        //shader.setVec3("x",1.0f, 1.0f, 1.0f);
+        phong.setMat4("model", transform);
 
         //rysowanie zająca
         test1.Draw();
-        transform = glm::mat4(1.0f);
-        shader.setMat4("model", transform);
+
+        //transform = glm::mat4(1.0f);
+        phong.setMat4("model", glm::mat4(1.0f));
         ground.Draw();
 
         //sun
@@ -218,13 +212,9 @@ int main()
         shaderSun.setMat4("view", mainCamera.getViewMtx());
        
         transform = glm::mat4(1.0f);
-        transform = glm::translate(transform, glm::vec3(10.0f, 10.0f, -10.0f));
+        transform = glm::translate(transform, lightPos);
         transform = glm::scale(transform, glm::vec3(0.001f, 0.001f, 0.001f));
         shaderSun.setMat4("model", transform);
-
-        //glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
 
         sunTex.UseOn(GL_TEXTURE0);
         sunTex.UseOn(GL_TEXTURE1);
