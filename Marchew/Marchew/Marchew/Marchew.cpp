@@ -141,9 +141,9 @@ int main()
 
     //ładowanie zająca
     Model test1("3Ds\\Bunny.obj");
-
+    Model marchew("3Ds\\Carrot_Z3G.obj");
     Model sun("3Ds\\Sun.obj");
-   
+    Model plot("3Ds\\Soil_Z3G.obj");
 
 
     //ładowanie tekstur i wrzucanie ich do openGL/na kartę graficzną
@@ -155,7 +155,10 @@ int main()
     grass.Load();
     Texture sunTex("sun.jpg");
     sunTex.Load();
-
+    Texture marchewTex("carrot_tex.png");
+    marchewTex.Load();
+    Texture soilTex("top-view-soil.jpg");
+    soilTex.Load();
     
     
     //włączenie testu głębi
@@ -201,6 +204,20 @@ int main()
 
         //rysowanie zająca
         test1.Draw();
+
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(1.0f, -1.0f, -1.0f));
+        transform = glm::scale(transform, glm::vec3(0.01f, 0.01f, 0.01f));
+        phong.setMat4("model", transform);
+        //marchewTex.UseOn(GL_TEXTURE0);
+        marchew.Draw();
+
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(2.0f, 1.0f, -1.0f));
+        transform = glm::scale(transform, glm::vec3(0.01f, 0.01f, 0.01f));
+        phong.setMat4("model", transform);
+        //soilTex.UseOn(GL_TEXTURE0);
+        plot.Draw();
 
         //transform = glm::mat4(1.0f);
         phong.setMat4("model", glm::mat4(1.0f));
