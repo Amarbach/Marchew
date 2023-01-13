@@ -7,13 +7,14 @@
 #include "include/glm/gtc/matrix_transform.hpp"
 #include "include/glm/gtc/type_ptr.hpp"
 
-
 #include "Camera.h"
 #include "ShaderProgram.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "Texture.h"
 #include "Mesh.h"
 #include "Model.h"
+
+# define M_PI 3.14159265358979323846
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -165,16 +166,25 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     glm::vec3 lightPos;
+    float daySecond = 0.0f;
    
     while (!glfwWindowShouldClose(window))
     {
         //sterowanie czasowe i wyznaczanie deltaTime
+        float dayLength = 86400.0f;
+        float timeScale = 240.0f;
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         processInput(window);
-        float vTime = (float)(glfwGetTime())/10.0f;
-        lightPos = glm::vec3(10.0f * cos(vTime), 10.0f * sin(vTime), -10.0f);
+        float vTime = (float)(glfwGetTime());
+        daySecond+= deltaTime * timeScale;
+        daySecond = daySecond > dayLength ? 0 : daySecond;
+        std::cout << daySecond << "\n";
+        float sunrise = 4.0f * 3600.0f;
+        float sunset = dayLength - (5.0f * 3600.0f);
+        bool isDay = (daySecond > sunrise) && (daySecond < sunset);
+        lightPos = glm::vec3(10.0f * cos((daySecond - (dayLength / 4.0f)) / (dayLength) * 2 * M_PI), 10.0f * sin((daySecond - (dayLength/4.0f)) / (dayLength) * 2 * M_PI), -10.0f);
 
         //czyszczenie
         glClearColor(0.1f, 0.3f, 0.6f, 1.0f);
@@ -182,12 +192,14 @@ int main()
 
         //wrzucenie tekstur na jednostki teksturowe
         tex1.UseOn(GL_TEXTURE0);
+        glm::vec3 lightColor = glm::vec3(0.3, 0.3, 0.3);
+        if (isDay) lightColor += glm::vec3(0.7, 0.7, 0.7) * (float)(((sin((daySecond - sunrise) / (sunset - sunrise) * M_PI)) + 1.0f) / 2.0f);
         
         //włączenie shadera i przekazanie macierzy projekcji, koloru światła, pozycji światła i pozycji obserwatora
         phong.use();
         phong.setMat4("projection", mainCamera.getProjectionMtx());
         phong.setInt("texture1", 0);
-        phong.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        phong.setVec3("lightColor", lightColor);
         phong.setVec3("lightPos", lightPos);
         phong.setVec3("viewPos", mainCamera.getPosition());
         //ustawianie macierzy view kamery(pozycja, rotacja i up)
@@ -209,7 +221,6 @@ int main()
         transform = glm::translate(transform, glm::vec3(1.0f, -1.0f, -1.0f));
         transform = glm::scale(transform, glm::vec3(0.01f, 0.01f, 0.01f));
         phong.setMat4("model", transform);
-        //marchewTex.UseOn(GL_TEXTURE0);
         marchew.Draw();
 
         transform = glm::mat4(1.0f);
@@ -235,7 +246,7 @@ int main()
 
         sunTex.UseOn(GL_TEXTURE0);
         sunTex.UseOn(GL_TEXTURE1);
-        sun.Draw();
+        if (isDay) sun.Draw();
 
 
         
