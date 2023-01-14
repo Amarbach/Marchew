@@ -72,6 +72,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExternalIncludePath>include\glad;include\GLFW;include\KHR;include\assimp;$(ExternalIncludePath)</ExternalIncludePath>
+    <IncludePath>C:\Users\ewacz\Documents\StudiaInf\PwAG\Marchew\Marchew\glut-3.7.6-bin\glut-3.7.6-bin;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\ewacz\Documents\StudiaInf\PwAG\Marchew\Marchew\glut-3.7.6-bin\glut-3.7.6-bin;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -132,6 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DayCycle.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Marchew.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -141,6 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DayCycle.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ShaderProgram.h" />
@@ -149,6 +153,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.fs" />
+    <None Include="phong1.fs" />
+    <None Include="phong1.vs" />
+    <None Include="sun.fs" />
+    <None Include="sun.vs" />
     <None Include="vertex.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

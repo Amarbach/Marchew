@@ -7,13 +7,15 @@
 #include "include/glm/gtc/matrix_transform.hpp"
 #include "include/glm/gtc/type_ptr.hpp"
 
-
 #include "Camera.h"
 #include "ShaderProgram.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "Texture.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "DayCycle.h"
+
+
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -27,6 +29,7 @@ float lastX = 800.0f / 2.0;
 float lastY = 600.0 / 2.0;
 
 bool toggleWireframe = false;
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -86,6 +89,10 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
     mainCamera.orient(xoffset, yoffset);
 }
+void drawSun() 
+{
+    //glutSolidSphere(1.25, 100, 100);
+}
 
 int main()
 {
@@ -113,56 +120,128 @@ int main()
     glfwSetKeyCallback(window, key_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    std::vector<Vertex> floor;
+    floor.push_back({ glm::vec3(-2.0f,  0.0f, 2.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f) });
+    floor.push_back({ glm::vec3(0.0f,   0.0f, 2.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f) });
+    floor.push_back({ glm::vec3(0.0f,  0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f) });
+    floor.push_back({ glm::vec3(-2.0f,  0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f) });
+    std::vector<unsigned int> indices;
+    indices.push_back(3);
+    indices.push_back(0);
+    indices.push_back(1);
+    indices.push_back(1);
+    indices.push_back(2);
+    indices.push_back(3);
+    std::vector<Texture> texs;
+    Mesh ground(floor, indices, texs);
+    ground.Load();
+
     //ładowanie shaderów
     ShaderProgram shader("vertex.vs", "fragment.fs");
+    ShaderProgram phong("phong1.vs", "phong1.fs");
+    ShaderProgram shaderSun("sun.vs", "sun.fs");
 
     //ładowanie zająca
     Model test1("3Ds\\Bunny.obj");
+    Model marchew("3Ds\\Carrot_Z3G.obj");
+    Model sun("3Ds\\Sun.obj");
+    Model plot("3Ds\\Soil_Z3G.obj");
+
 
     //ładowanie tekstur i wrzucanie ich do openGL/na kartę graficzną
     Texture tex1("tex1.jpg");
     tex1.Load();
     Texture tex2("tex2.jpg");
     tex2.Load();
-
+    Texture grass("grass.jpg");
+    grass.Load();
+    Texture sunTex("sun.jpg");
+    sunTex.Load();
+    Texture marchewTex("carrot_tex.png");
+    marchewTex.Load();
+    Texture soilTex("top-view-soil.jpg");
+    soilTex.Load();
     
-    //włączenie shadera i przekazanie macierzy projekcji
-    shader.use();
-    shader.setMat4("projection", mainCamera.getProjectionMtx());
-    shader.setInt("texture1", 0);
-    shader.setInt("texture2", 1);
+    DayCycle cycle;
+    cycle.setTimeScale(2400.0f);
     
     //włączenie testu głębi
     glEnable(GL_DEPTH_TEST);
-
+   
     while (!glfwWindowShouldClose(window))
     {
         //sterowanie czasowe i wyznaczanie deltaTime
+
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         processInput(window);
+        float vTime = (float)(glfwGetTime());
+        glm::vec3 lightPos = 10.0f * cycle.getSunDirection();
+        cycle.update(deltaTime);
 
         //czyszczenie
-        glClearColor(0.9f, 0.6f, 0.6f, 1.0f);
+        glClearColor(0.1f, 0.3f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //wrzucenie tekstur na jednostki teksturowe
-        //tex1.UseOn(GL_TEXTURE0);
-        //tex2.UseOn(GL_TEXTURE1);
+        tex1.UseOn(GL_TEXTURE0);
+        glm::vec3 lightColor = glm::vec3(1.0, 1.0, 1.0) * cycle.getSunlightIntensity();
+        
+        //włączenie shadera i przekazanie macierzy projekcji, koloru światła, pozycji światła i pozycji obserwatora
+        phong.use();
+        phong.setMat4("projection", mainCamera.getProjectionMtx());
+        phong.setInt("texture1", 0);
+        phong.setVec3("lightColor", lightColor);
+        phong.setVec3("lightPos", lightPos);
+        phong.setVec3("viewPos", mainCamera.getPosition());
+        //ustawianie macierzy view kamery(pozycja, rotacja i up)
+        phong.setMat4("view", mainCamera.getViewMtx());
 
         //wyznaczenie pozycji, rotacji i skali zająca
-        float vTime = (float)glfwGetTime();
+        
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         //transform = glm::translate(transform, glm::vec3(0.0f, sin(vTime)/2.0, 0.0f));
         transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, -1.0f));
-        transform = glm::rotate(transform, vTime, glm::vec3(0.0f, 1.0f, 0.0f));
+        //transform = glm::rotate(transform, vTime, glm::vec3(0.0f, 1.0f, 0.0f));
         transform = glm::scale(transform, glm::vec3(0.1f, 0.1f, 0.1f));
-        shader.setMat4("model", transform);
+        phong.setMat4("model", transform);
+
         //rysowanie zająca
         test1.Draw();
-        //ustawianie macierzy view kamery(pozycja, rotacja i up)
-        shader.setMat4("view", mainCamera.getViewMtx());
+
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(1.0f, -1.0f, -1.0f));
+        transform = glm::scale(transform, glm::vec3(0.01f, 0.01f, 0.01f));
+        phong.setMat4("model", transform);
+        marchew.Draw();
+
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(2.0f, 1.0f, -1.0f));
+        transform = glm::scale(transform, glm::vec3(0.01f, 0.01f, 0.01f));
+        phong.setMat4("model", transform);
+        //soilTex.UseOn(GL_TEXTURE0);
+        plot.Draw();
+
+        //transform = glm::mat4(1.0f);
+        phong.setMat4("model", glm::mat4(1.0f));
+        ground.Draw();
+
+        //sun
+        shaderSun.use();
+        shaderSun.setMat4("projection", mainCamera.getProjectionMtx());
+        shaderSun.setMat4("view", mainCamera.getViewMtx());
+       
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, lightPos);
+        transform = glm::scale(transform, glm::vec3(0.001f, 0.001f, 0.001f));
+        shaderSun.setMat4("model", transform);
+
+        sunTex.UseOn(GL_TEXTURE0);
+        sunTex.UseOn(GL_TEXTURE1);
+        if (cycle.isDay()) sun.Draw();
+
+
         
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -171,4 +250,3 @@ int main()
     glfwTerminate();
     return 0;
 }
-

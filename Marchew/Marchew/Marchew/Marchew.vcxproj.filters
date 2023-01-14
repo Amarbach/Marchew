@@ -39,6 +39,9 @@
     <ClCompile Include="Model.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="DayCycle.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ShaderProgram.h">
@@ -59,12 +62,27 @@
     <ClInclude Include="Model.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
+    <ClInclude Include="DayCycle.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.fs">
       <Filter>Shaders</Filter>
     </None>
     <None Include="vertex.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="sun.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="sun.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="phong1.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="phong1.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

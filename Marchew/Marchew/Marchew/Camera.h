@@ -22,5 +22,6 @@ public:
 	void moveForward(float displacement);
 	void moveSide(float displacement);
 	void moveUp(float displacement);
+	glm::vec3 getPosition();
 };
 
