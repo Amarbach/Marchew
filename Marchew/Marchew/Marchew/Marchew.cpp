@@ -13,8 +13,9 @@
 #include "Texture.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "DayCycle.h"
 
-# define M_PI 3.14159265358979323846
+
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -161,30 +162,23 @@ int main()
     Texture soilTex("top-view-soil.jpg");
     soilTex.Load();
     
+    DayCycle cycle;
+    cycle.setTimeScale(2400.0f);
     
     //włączenie testu głębi
     glEnable(GL_DEPTH_TEST);
-
-    glm::vec3 lightPos;
-    float daySecond = 0.0f;
    
     while (!glfwWindowShouldClose(window))
     {
         //sterowanie czasowe i wyznaczanie deltaTime
-        float dayLength = 86400.0f;
-        float timeScale = 240.0f;
+
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         processInput(window);
         float vTime = (float)(glfwGetTime());
-        daySecond+= deltaTime * timeScale;
-        daySecond = daySecond > dayLength ? 0 : daySecond;
-        std::cout << daySecond << "\n";
-        float sunrise = 4.0f * 3600.0f;
-        float sunset = dayLength - (5.0f * 3600.0f);
-        bool isDay = (daySecond > sunrise) && (daySecond < sunset);
-        lightPos = glm::vec3(10.0f * cos((daySecond - (dayLength / 4.0f)) / (dayLength) * 2 * M_PI), 10.0f * sin((daySecond - (dayLength/4.0f)) / (dayLength) * 2 * M_PI), -10.0f);
+        glm::vec3 lightPos = 10.0f * cycle.getSunDirection();
+        cycle.update(deltaTime);
 
         //czyszczenie
         glClearColor(0.1f, 0.3f, 0.6f, 1.0f);
@@ -192,8 +186,7 @@ int main()
 
         //wrzucenie tekstur na jednostki teksturowe
         tex1.UseOn(GL_TEXTURE0);
-        glm::vec3 lightColor = glm::vec3(0.3, 0.3, 0.3);
-        if (isDay) lightColor += glm::vec3(0.7, 0.7, 0.7) * (float)(((sin((daySecond - sunrise) / (sunset - sunrise) * M_PI)) + 1.0f) / 2.0f);
+        glm::vec3 lightColor = glm::vec3(1.0, 1.0, 1.0) * cycle.getSunlightIntensity();
         
         //włączenie shadera i przekazanie macierzy projekcji, koloru światła, pozycji światła i pozycji obserwatora
         phong.use();
@@ -246,7 +239,7 @@ int main()
 
         sunTex.UseOn(GL_TEXTURE0);
         sunTex.UseOn(GL_TEXTURE1);
-        if (isDay) sun.Draw();
+        if (cycle.isDay()) sun.Draw();
 
 
         
