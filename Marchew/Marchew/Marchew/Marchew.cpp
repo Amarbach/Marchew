@@ -14,7 +14,8 @@
 #include "Mesh.h"
 #include "Model.h"
 #include "DayCycle.h"
-
+#include "Bed.h"
+#include "Carrot.h"
 
 
 const unsigned int SCR_WIDTH = 800;
@@ -47,10 +48,10 @@ void processInput(GLFWwindow* window)
         mainCamera.moveSide(-cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         mainCamera.moveSide(cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        mainCamera.moveUp(cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-        mainCamera.moveUp(-cameraSpeed);
+    //if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+       // mainCamera.moveUp(cameraSpeed);
+   // if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+      //  mainCamera.moveUp(-cameraSpeed);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -94,6 +95,65 @@ void drawSun()
     //glutSolidSphere(1.25, 100, 100);
 }
 
+Mesh drawFloor()
+{
+    std::vector<Vertex> floor;
+    floor.push_back({ glm::vec3(-100.0f, -3.0f, 100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(10.0f, 0.0f) });
+    floor.push_back({ glm::vec3(0.0f, -3.0f, 100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f) });
+    floor.push_back({ glm::vec3(0.0f, -3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 10.0f) });
+    floor.push_back({ glm::vec3(-100.0f, -3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(10.0f, 10.0f) });
+
+    floor.push_back({ glm::vec3(0.0f, -3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(10.0f, 0.0f) });
+    floor.push_back({ glm::vec3(100.0f, -3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f) });
+    floor.push_back({ glm::vec3(100.0f, -3.0f, -100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 10.0f) });
+    floor.push_back({ glm::vec3(0.0f, -3.0f, -100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(10.0f, 10.0f) });
+
+    floor.push_back({ glm::vec3(-100.0f, -3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(10.0f, 0.0f) });
+    floor.push_back({ glm::vec3(0.0f, -3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f) });
+    floor.push_back({ glm::vec3(0.0f, -3.0f, -100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 10.0f) });
+    floor.push_back({ glm::vec3(-100.0f, -3.0f, -100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(10.0f, 10.0f) });
+
+    floor.push_back({ glm::vec3(0.0f, -3.0f, 100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(10.0f, 0.0f) });
+    floor.push_back({ glm::vec3(100.0f, -3.0f, 100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f) });
+    floor.push_back({ glm::vec3(100.0f, -3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 10.0f) });
+    floor.push_back({ glm::vec3(0.0f, -3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(10.0f, 10.0f) });
+
+    std::vector<unsigned int> indices;
+    indices.push_back(3);
+    indices.push_back(0);
+    indices.push_back(1);
+    indices.push_back(1);
+    indices.push_back(2);
+    indices.push_back(3);
+
+    indices.push_back(7);
+    indices.push_back(4);
+    indices.push_back(5);
+    indices.push_back(5);
+    indices.push_back(6);
+    indices.push_back(7);
+
+    indices.push_back(11);
+    indices.push_back(8);
+    indices.push_back(9);
+    indices.push_back(9);
+    indices.push_back(10);
+    indices.push_back(11);
+
+    indices.push_back(15);
+    indices.push_back(12);
+    indices.push_back(13);
+    indices.push_back(13);
+    indices.push_back(14);
+    indices.push_back(15);
+
+    std::vector<Texture> texs;
+    Mesh ground(floor, indices, texs);
+    ground.Load();
+
+    return ground;
+}
+
 int main()
 {
     //inicjalizacja
@@ -120,33 +180,16 @@ int main()
     glfwSetKeyCallback(window, key_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    std::vector<Vertex> floor;
-    floor.push_back({ glm::vec3(-2.0f,  0.0f, 2.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f) });
-    floor.push_back({ glm::vec3(0.0f,   0.0f, 2.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f) });
-    floor.push_back({ glm::vec3(0.0f,  0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f) });
-    floor.push_back({ glm::vec3(-2.0f,  0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f) });
-    std::vector<unsigned int> indices;
-    indices.push_back(3);
-    indices.push_back(0);
-    indices.push_back(1);
-    indices.push_back(1);
-    indices.push_back(2);
-    indices.push_back(3);
-    std::vector<Texture> texs;
-    Mesh ground(floor, indices, texs);
-    ground.Load();
+    Mesh ground = drawFloor();
 
     //ładowanie shaderów
     ShaderProgram shader("vertex.vs", "fragment.fs");
     ShaderProgram phong("phong1.vs", "phong1.fs");
     ShaderProgram shaderSun("sun.vs", "sun.fs");
 
-    //ładowanie zająca
+    //ładowanie modeli
     Model test1("3Ds\\Bunny.obj");
-    Model marchew("3Ds\\Carrot_Z3G.obj");
     Model sun("3Ds\\Sun.obj");
-    Model plot("3Ds\\Soil_Z3G.obj");
-
 
     //ładowanie tekstur i wrzucanie ich do openGL/na kartę graficzną
     Texture tex1("tex1.jpg");
@@ -157,10 +200,6 @@ int main()
     grass.Load();
     Texture sunTex("sun.jpg");
     sunTex.Load();
-    Texture marchewTex("carrot_tex.png");
-    marchewTex.Load();
-    Texture soilTex("top-view-soil.jpg");
-    soilTex.Load();
     
     DayCycle cycle;
     cycle.setTimeScale(2400.0f);
@@ -168,6 +207,9 @@ int main()
     //włączenie testu głębi
     glEnable(GL_DEPTH_TEST);
    
+    Bed bed = Bed();
+    Carrot carrot = Carrot();
+
     while (!glfwWindowShouldClose(window))
     {
         //sterowanie czasowe i wyznaczanie deltaTime
@@ -177,7 +219,7 @@ int main()
         lastFrame = currentFrame;
         processInput(window);
         float vTime = (float)(glfwGetTime());
-        glm::vec3 lightPos = 10.0f * cycle.getSunDirection();
+        glm::vec3 lightPos = 100.0f * cycle.getSunDirection();
         cycle.update(deltaTime);
 
         //czyszczenie
@@ -210,18 +252,11 @@ int main()
         //rysowanie zająca
         test1.Draw();
 
-        transform = glm::mat4(1.0f);
-        transform = glm::translate(transform, glm::vec3(1.0f, -1.0f, -1.0f));
-        transform = glm::scale(transform, glm::vec3(0.01f, 0.01f, 0.01f));
-        phong.setMat4("model", transform);
-        marchew.Draw();
-
-        transform = glm::mat4(1.0f);
-        transform = glm::translate(transform, glm::vec3(2.0f, 1.0f, -1.0f));
-        transform = glm::scale(transform, glm::vec3(0.01f, 0.01f, 0.01f));
-        phong.setMat4("model", transform);
-        //soilTex.UseOn(GL_TEXTURE0);
-        plot.Draw();
+        //marchew
+        carrot.draw(phong);
+        
+        //grządka
+        bed.draw(phong);
 
         //transform = glm::mat4(1.0f);
         phong.setMat4("model", glm::mat4(1.0f));
@@ -234,14 +269,12 @@ int main()
        
         transform = glm::mat4(1.0f);
         transform = glm::translate(transform, lightPos);
-        transform = glm::scale(transform, glm::vec3(0.001f, 0.001f, 0.001f));
+        transform = glm::scale(transform, glm::vec3(0.005f, 0.005f, 0.005f));
         shaderSun.setMat4("model", transform);
 
         sunTex.UseOn(GL_TEXTURE0);
         sunTex.UseOn(GL_TEXTURE1);
         if (cycle.isDay()) sun.Draw();
-
-
         
         glfwSwapBuffers(window);
         glfwPollEvents();

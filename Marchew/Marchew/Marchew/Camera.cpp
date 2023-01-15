@@ -59,7 +59,9 @@ void Camera::translate(float x, float y, float z)
 
 void Camera::moveForward(float displacement)
 {
+	double y = this->position.g;
 	this->position += this->front * displacement;
+	this->position.g = y;
 }
 
 void Camera::moveSide(float displacement)
