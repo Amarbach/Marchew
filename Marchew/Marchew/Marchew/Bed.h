@@ -9,6 +9,7 @@ class Bed : public Object
 {
 public:
 	Bed();
+	Bed(glm::vec3 _position, glm::vec3 _scale);
 	void init();
 	void draw(ShaderProgram& phong);
 private:

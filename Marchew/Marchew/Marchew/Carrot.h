@@ -8,6 +8,7 @@ class Carrot : public Object
 {
 public:
 	Carrot();
+	Carrot(glm::vec3 _position, glm::vec3 _scale);
 	void init();
 	void draw(ShaderProgram& phong);
 private:

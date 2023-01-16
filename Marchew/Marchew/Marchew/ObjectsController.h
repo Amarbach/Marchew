@@ -1,10 +1,13 @@
 #pragma once
 #include "Object.h"
-#include <list>
+#include <vector>
 
 class ObjectsController
 {
+public:
+	void addObject(Object* object);
+	void drawObjects(ShaderProgram& phong);
 private:
-	std::list<Object> allObjecjtsInGame;
+	std::vector<Object*> allObjecjtsInGame;
 };
 

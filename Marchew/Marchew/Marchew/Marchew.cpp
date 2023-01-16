@@ -16,7 +16,7 @@
 #include "DayCycle.h"
 #include "Bed.h"
 #include "Carrot.h"
-
+#include "ObjectsController.h"
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -30,6 +30,7 @@ float lastX = 800.0f / 2.0;
 float lastY = 600.0 / 2.0;
 
 bool toggleWireframe = false;
+ObjectsController objectController = ObjectsController();
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -200,6 +201,8 @@ int main()
     grass.Load();
     Texture sunTex("sun.jpg");
     sunTex.Load();
+    Texture soilTex("top-view-soil.jpg");
+    soilTex.Load();
     
     DayCycle cycle;
     cycle.setTimeScale(2400.0f);
@@ -207,8 +210,18 @@ int main()
     //włączenie testu głębi
     glEnable(GL_DEPTH_TEST);
    
-    Bed bed = Bed();
-    Carrot carrot = Carrot();
+    //tworzymy obiekty
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 5; j++)
+        {
+            Bed* bed = new Bed(glm::vec3(2.0f + (i * 3.5f), -1.8f, -1.0f + (j*8.3f)), glm::vec3(0.002f, 0.002f, 0.002f));
+            objectController.addObject(bed);
+        }
+    }
+
+    Carrot *carrot = new Carrot(glm::vec3 (1.0f, -1.0f, -1.0f), glm::vec3(0.001f, 0.001f, 0.001f));
+    objectController.addObject(carrot);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -252,13 +265,11 @@ int main()
         //rysowanie zająca
         test1.Draw();
 
-        //marchew
-        carrot.draw(phong);
-        
-        //grządka
-        bed.draw(phong);
+        //rysujemy obiekty
+        objectController.drawObjects(phong);
 
         //transform = glm::mat4(1.0f);
+        soilTex.UseOn(GL_TEXTURE0);
         phong.setMat4("model", glm::mat4(1.0f));
         ground.Draw();
 
