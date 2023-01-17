@@ -38,6 +38,16 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void seedCarrot()
+{
+    Bed* bed = objectController.findNearestBed(mainCamera.getPosition());
+    if (bed == nullptr)
+    {
+        return;
+    }
+    bed->seedCarrot(objectController);
+}
+
 void processInput(GLFWwindow* window)
 {
     float cameraSpeed = static_cast<float>(2.5 * deltaTime);
@@ -53,6 +63,8 @@ void processInput(GLFWwindow* window)
        // mainCamera.moveUp(cameraSpeed);
    // if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
       //  mainCamera.moveUp(-cameraSpeed);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        seedCarrot();
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -189,39 +201,33 @@ int main()
     ShaderProgram shaderSun("sun.vs", "sun.fs");
 
     //ładowanie modeli
-    Model test1("3Ds\\Bunny.obj");
-    Model sun("3Ds\\Sun.obj");
+    Model bunny = Model("3Ds\\Bunny.obj");
+    Model sun = Model("3Ds\\Sun.obj");
 
     //ładowanie tekstur i wrzucanie ich do openGL/na kartę graficzną
-    Texture tex1("tex1.jpg");
-    tex1.Load();
-    Texture tex2("tex2.jpg");
-    tex2.Load();
-    Texture grass("grass.jpg");
-    grass.Load();
-    Texture sunTex("sun.jpg");
+    Texture bunnyTex = Texture("tex1.jpg");
+    bunnyTex.Load();
+    Texture sunTex = Texture("sun.jpg");
     sunTex.Load();
-    Texture soilTex("top-view-soil.jpg");
+    Texture soilTex = Texture("top-view-soil.jpg");
     soilTex.Load();
-    
+
     DayCycle cycle;
-    cycle.setTimeScale(2400.0f);
+    cycle.setTimeScale(4800.0f);
     
     //włączenie testu głębi
     glEnable(GL_DEPTH_TEST);
    
-    //tworzymy obiekty
+    //tworzymy poletko
     for (int i = 0; i < 10; i++)
     {
         for (int j = 0; j < 5; j++)
         {
             Bed* bed = new Bed(glm::vec3(2.0f + (i * 3.5f), -1.8f, -1.0f + (j*8.3f)), glm::vec3(0.002f, 0.002f, 0.002f));
             objectController.addObject(bed);
+            objectController.addBed(bed);
         }
     }
-
-    Carrot *carrot = new Carrot(glm::vec3 (1.0f, -1.0f, -1.0f), glm::vec3(0.001f, 0.001f, 0.001f));
-    objectController.addObject(carrot);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -240,7 +246,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //wrzucenie tekstur na jednostki teksturowe
-        tex1.UseOn(GL_TEXTURE0);
+        bunnyTex.UseOn(GL_TEXTURE0);
         glm::vec3 lightColor = glm::vec3(1.0, 1.0, 1.0) * cycle.getSunlightIntensity();
         
         //włączenie shadera i przekazanie macierzy projekcji, koloru światła, pozycji światła i pozycji obserwatora
@@ -263,7 +269,7 @@ int main()
         phong.setMat4("model", transform);
 
         //rysowanie zająca
-        test1.Draw();
+        bunny.Draw();
 
         //rysujemy obiekty
         objectController.drawObjects(phong);
