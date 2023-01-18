@@ -30,6 +30,8 @@ float lastX = 800.0f / 2.0;
 float lastY = 600.0 / 2.0;
 
 bool toggleWireframe = false;
+
+DayCycle cycle;
 ObjectsController objectController = ObjectsController();
 
 
@@ -40,6 +42,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void seedCarrot()
 {
+    if (!cycle.isDay())
+    {
+        return;
+    }
+
     Bed* bed = objectController.findNearestBed(mainCamera.getPosition());
     if (bed == nullptr)
     {
@@ -47,6 +54,19 @@ void seedCarrot()
     }
     bed->seedCarrot(objectController);
 }
+
+void takeCarrot()
+{
+    Bed* bed = objectController.findNearestBed(mainCamera.getPosition());
+    if (bed == nullptr)
+    {
+        return;
+    }
+    bed->takeCarrot(objectController);
+}
+
+bool seedKey = false;
+bool takeKey = false;
 
 void processInput(GLFWwindow* window)
 {
@@ -64,7 +84,20 @@ void processInput(GLFWwindow* window)
    // if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
       //  mainCamera.moveUp(-cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        seedKey = true;
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        takeKey = true;
+
+    if (seedKey && glfwGetKey(window, GLFW_KEY_Q) == GLFW_RELEASE)
+    {
+        seedKey = false;
         seedCarrot();
+    }
+    if (takeKey && glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE)
+    {
+        takeKey = false;
+        takeCarrot();
+    } 
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -212,8 +245,7 @@ int main()
     Texture soilTex = Texture("top-view-soil.jpg");
     soilTex.Load();
 
-    DayCycle cycle;
-    cycle.setTimeScale(4800.0f);
+    cycle.setTimeScale(1200.0f);
     
     //włączenie testu głębi
     glEnable(GL_DEPTH_TEST);
@@ -240,6 +272,7 @@ int main()
         float vTime = (float)(glfwGetTime());
         glm::vec3 lightPos = 100.0f * cycle.getSunDirection();
         cycle.update(deltaTime);
+        objectController.carrotsGrowing(deltaTime);
 
         //czyszczenie
         glClearColor(0.1f, 0.3f, 0.6f, 1.0f);

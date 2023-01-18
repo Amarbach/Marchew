@@ -31,9 +31,9 @@ Bed::Bed(glm::vec3 _positon, glm::vec3 _scale) : Bed()
     carrotPositions.push_back(glm::vec3(carrotXpos, -2.5f, position.z-2.0f));
     carrotPositions.push_back(glm::vec3(carrotXpos, -2.5f, position.z+2.0f));
 
-    hasCarrot.push_back(false);
-    hasCarrot.push_back(false);
-    hasCarrot.push_back(false);
+    carrots.push_back(nullptr);
+    carrots.push_back(nullptr);
+    carrots.push_back(nullptr);
 }
 
 void Bed::init()
@@ -55,12 +55,29 @@ void Bed::seedCarrot(ObjectsController &objectsController)
 {
     for (int i = 0; i < 3; i++)
     {
-        if (!hasCarrot[i])
+        if (carrots[i] == nullptr)
         {
-            hasCarrot[i] = true;
-            Carrot* carrot = new Carrot(carrotPositions[i], glm::vec3(0.002f, 0.002f, 0.002f));
+            Carrot* carrot = new Carrot(glm::vec3(carrotPositions[i].x, carrotPositions[i].y - 0.4f, carrotPositions[i].z), glm::vec3(0.002f, 0.002f, 0.002f));
+            carrots[i] = carrot;
             carrot->connectedToBed = this;
             objectsController.addObject(carrot);
+            objectsController.addCarrot(carrot);
+
+            return;
+        }
+    }
+}
+
+void Bed::takeCarrot(ObjectsController& objectsController)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        if (carrots[i] != nullptr && !carrots[i]->isGrowing)
+        {
+            objectsController.removeCarrot(carrots[i]);
+            objectsController.removeObject(carrots[i]);
+            delete carrots[i];
+            carrots[i] = nullptr;
 
             return;
         }

@@ -6,6 +6,7 @@
 #include <vector>
 
 class ObjectsController;
+class Carrot;
 
 class Bed : public Object
 {
@@ -15,9 +16,10 @@ public:
 	void init();
 	void draw(ShaderProgram& phong);
 	void seedCarrot(ObjectsController& objectsController);
+	void takeCarrot(ObjectsController& objectsController);
 private:
 	std::vector<glm::vec3> carrotPositions;
-	std::vector<bool> hasCarrot;
+	std::vector<Carrot*> carrots;
 	Model* model;
 	Texture* texture;
 };
