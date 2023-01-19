@@ -4,7 +4,7 @@
 
 Carrot::Carrot()
 {
-    model = new Model("3Ds\\Carrot_Z3G.obj");
+    model = new Model("3Ds\\Carrot_v3_m_Z3G.obj");
 
     texture = new Texture("carrot_tex.png");
     texture->Load();
