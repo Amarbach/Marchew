@@ -234,12 +234,9 @@ int main()
     ShaderProgram shaderSun("sun.vs", "sun.fs");
 
     //ładowanie modeli
-    Model bunny = Model("3Ds\\Bunny.obj");
     Model sun = Model("3Ds\\Sun.obj");
 
-    //ładowanie tekstur i wrzucanie ich do openGL/na kartę graficzną
-    Texture bunnyTex = Texture("tex1.jpg");
-    bunnyTex.Load();
+    //ładowanie tekstur i wrzucanie ich do openGL/na kartę graficzna;
     Texture sunTex = Texture("sun.jpg");
     sunTex.Load();
     Texture soilTex = Texture("top-view-soil.jpg");
@@ -260,7 +257,7 @@ int main()
             objectController.addBed(bed);
         }
     }
-
+    objectController.spawnRabbits(8);
     while (!glfwWindowShouldClose(window))
     {
         //sterowanie czasowe i wyznaczanie deltaTime
@@ -279,7 +276,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //wrzucenie tekstur na jednostki teksturowe
-        bunnyTex.UseOn(GL_TEXTURE0);
+      
         glm::vec3 lightColor = glm::vec3(1.0, 1.0, 1.0) * cycle.getSunlightIntensity();
         
         //włączenie shadera i przekazanie macierzy projekcji, koloru światła, pozycji światła i pozycji obserwatora
@@ -296,17 +293,14 @@ int main()
         
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         //transform = glm::translate(transform, glm::vec3(0.0f, sin(vTime)/2.0, 0.0f));
-        transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, -1.0f));
-        //transform = glm::rotate(transform, vTime, glm::vec3(0.0f, 1.0f, 0.0f));
+    /*    transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, -1.0f));
+        transform = glm::rotate(transform, vTime, glm::vec3(0.0f, 1.0f, 0.0f));
         transform = glm::scale(transform, glm::vec3(0.1f, 0.1f, 0.1f));
-        phong.setMat4("model", transform);
-
-        //rysowanie zająca
-        bunny.Draw();
-
+        phong.setMat4("model", transform);*/
+  
         //rysujemy obiekty
         objectController.drawObjects(phong);
-
+       
         //transform = glm::mat4(1.0f);
         soilTex.UseOn(GL_TEXTURE0);
         phong.setMat4("model", glm::mat4(1.0f));
@@ -325,7 +319,13 @@ int main()
         sunTex.UseOn(GL_TEXTURE0);
         sunTex.UseOn(GL_TEXTURE1);
         if (cycle.isDay()) sun.Draw();
-        
+        else
+        {
+            objectController.EatCarrot();
+            objectController.drawRabbits(phong);
+            objectController.runToCarrot(1.f);
+            objectController.KillNearRabbit(mainCamera.getPosition());
+        }
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

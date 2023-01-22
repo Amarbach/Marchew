@@ -72,8 +72,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExternalIncludePath>include\glad;include\GLFW;include\KHR;include\assimp;$(ExternalIncludePath)</ExternalIncludePath>
-    <IncludePath>C:\Users\ewacz\Documents\StudiaInf\PwAG\Marchew\Marchew\glut-3.7.6-bin\glut-3.7.6-bin;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\ewacz\Documents\StudiaInf\PwAG\Marchew\Marchew\glut-3.7.6-bin\glut-3.7.6-bin;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -109,6 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,20 +132,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bed.cpp" />
+    <ClCompile Include="Rabbit.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Carrot.cpp" />
     <ClCompile Include="DayCycle.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Marchew.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ObjectsController.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bed.h" />
+    <ClInclude Include="Rabbit.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Carrot.h" />
     <ClInclude Include="DayCycle.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="ObjectsController.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
@@ -158,6 +165,11 @@
     <None Include="sun.fs" />
     <None Include="sun.vs" />
     <None Include="vertex.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="3Ds\carrot_tex.png" />
+    <Image Include="3Ds\top-view-soil.jpg" />
+    <Image Include="textures\rabbit_fur.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

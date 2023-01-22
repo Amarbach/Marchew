@@ -42,6 +42,18 @@
     <ClCompile Include="DayCycle.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="Bed.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="Carrot.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectsController.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="Rabbit.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ShaderProgram.h">
@@ -65,6 +77,18 @@
     <ClInclude Include="DayCycle.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
+    <ClInclude Include="Bed.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="Carrot.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectsController.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="Rabbit.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.fs">
@@ -85,5 +109,16 @@
     <None Include="phong1.vs">
       <Filter>Shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="3Ds\carrot_tex.png">
+      <Filter>Pliki zasobów</Filter>
+    </Image>
+    <Image Include="3Ds\top-view-soil.jpg">
+      <Filter>Pliki zasobów</Filter>
+    </Image>
+    <Image Include="textures\rabbit_fur.jpg">
+      <Filter>Pliki zasobów</Filter>
+    </Image>
   </ItemGroup>
 </Project>

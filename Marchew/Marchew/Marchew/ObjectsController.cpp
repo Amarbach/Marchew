@@ -2,6 +2,8 @@
 #include <vector>
 #include"Bed.h"
 #include <cmath>
+#include <stdlib.h>
+#include <numbers> 
 
 
 void ObjectsController::addObject(Object* object)
@@ -26,6 +28,12 @@ void ObjectsController::addBed(Bed* bed)
 	beds.push_back(bed);
 }
 
+void ObjectsController::addRabbit(Rabbit* rabbit)
+{
+	rabbits.push_back(rabbit);
+}
+
+
 void ObjectsController::addCarrot(Carrot* carrot)
 {
 	carrots.push_back(carrot);
@@ -45,9 +53,21 @@ void ObjectsController::removeCarrot(Carrot* carrot)
 
 void ObjectsController::drawObjects(ShaderProgram& phong)
 {
-	for (int i = 0; i < allObjecjtsInGame.size(); i++)
+	for (int i = 0; i < carrots.size(); i++)
 	{
-		allObjecjtsInGame[i]->draw(phong);
+		carrots[i]->draw(phong);
+	}
+	for (int i = 0; i < beds.size(); i++)
+	{
+		beds[i]->draw(phong);
+	}
+}
+
+void ObjectsController::drawRabbits(ShaderProgram& phong)
+{
+	for (int i = 0; i < rabbits.size(); i++)
+	{
+		rabbits[i]->draw(phong);
 	}
 }
 
@@ -72,6 +92,34 @@ Bed* ObjectsController::findNearestBed(glm::vec3 currentPosition)
 
 	return nullptr;
 }
+void ObjectsController::KillNearRabbit(glm::vec3 currentPosition)
+{
+	float minDistance = 4.f;
+	for (int i = 0; i < rabbits.size(); i++)
+	{
+		float dist = CalculateDistance(rabbits[i]->position, currentPosition);
+		if (dist < minDistance)
+		{
+			rabbits.erase(rabbits.begin() + i);
+			return;
+		}
+	}
+}
+void ObjectsController::EatCarrot()
+{
+	float minDistance = 3.f;
+	for (int i = 0; i < rabbits.size(); i++)
+	{
+		for (int j = 0; j < carrots.size(); j++)
+		{
+			float dist = CalculateDistance(rabbits[i]->position, carrots[j]->position);
+			if (dist < minDistance) {
+				rabbits[i]->carrot = nullptr;
+				carrots.erase(carrots.begin() + j);
+			}
+		}
+	}
+}
 
 float ObjectsController::CalculateDistance(glm::vec3 p1, glm::vec3 p2)
 {
@@ -88,4 +136,57 @@ void ObjectsController::carrotsGrowing(float elapsed)
 	{
 		carrots[i]->grow(elapsed);
 	}
+}
+
+void ObjectsController::runToCarrot(float elapsed)
+{
+	Rabbit* rabbit;
+	float dist;
+	for (int i = 0; i < rabbits.size(); i++)
+	{
+		rabbit = rabbits[i];
+		if (carrots.empty())
+			rabbit->runForward();
+			
+
+		else if (rabbit->carrot != nullptr)
+			rabbit->runToCarrot();
+
+		else
+		{
+			int carrotIndex = rand() % carrots.size();
+			rabbit->carrot = carrots[carrotIndex];
+			rabbit->runToCarrot();
+		}
+	}
+}
+
+void ObjectsController::spawnRabbits(int quant)
+{
+	quant = quant / 4;
+	int x[2] = { 0, 18 };
+	int z[2] = { -3, 34 };
+	float y = -1.8f;
+	float pi = (float)std::numbers::pi;
+
+	Rabbit* rabbit;
+	for (int i = 0; i < quant; i++)
+	{
+		rabbit = new Rabbit(glm::vec3(x[0], y, z[0] + rand() % z[1]),pi);
+		rabbits.push_back(rabbit);
+
+		rabbit = new Rabbit(glm::vec3(x[1], y, z[0] + rand() % z[1]),pi);
+		rabbits.push_back(rabbit);
+
+		rabbit = new Rabbit(glm::vec3(x[0] + rand() % x[1], y, z[0]),pi);
+		rabbits.push_back(rabbit);
+
+		rabbit = new Rabbit(glm::vec3(x[0] + rand() % x[1], y, z[1]),pi);
+		rabbits.push_back(rabbit);
+	}
+
+}
+ObjectsController::ObjectsController()
+{
+	srand(time(0));
 }
