@@ -29,7 +29,8 @@ void Rabbit::draw(ShaderProgram& phong){
 
     glm::mat4 transform = glm::mat4(1.0f);
     transform = glm::translate(transform, position);
-    transform = glm::scale(transform, scale);
+    transform = glm::scale(transform, scale); transform = glm::rotate(transform, angleY, glm::vec3(0, 1, 0));
+    phong.setMat4("model", transform);
     phong.setMat4("model", transform);
     texture->UseOn(GL_TEXTURE0);
     model->Draw();
@@ -43,28 +44,26 @@ void Rabbit::runToCarrot()
     float distX = carrot->position.x - position.x;
     float distZ = carrot->position.z - position.z;
     float dist = carrotDistance();
-    angleY = asin(distX / dist);
     position.x += speed * distX / dist;
-    position.z += speed * distZ /dist;
+    position.z += speed * distZ / dist;
 }
 
 void Rabbit::runForward()
 {
-    position.z -= speed;
-    position.x -= speed;
+    position.z -= speed*1.5;
+    position.x -= speed*1.5;
+    angleY = 0;
 }
-float::Rabbit::carrotAngle() {
-    float distX = carrot->position.x - position.x;
-    float distZ = carrot->position.z - position.z;
-    return atan(tan(distX / distZ));
-}
-void::Rabbit::rotateRabbit(ShaderProgram& phong) {
-    float angle = carrotAngle();
-    glm::mat4 transform = glm::mat4(1.0f);
-    transform = glm::rotate(transform, angle-angleY, glm::vec3(0, 1, 0));
-    phong.setMat4("model", transform);
 
-    angleY = angle;
+float::Rabbit::carrotAngle() {
+    float distX = position.x -carrot->position.x;
+    float distZ = position.z-carrot->position.z;
+    return atan(distX / distZ);
+}
+
+void::Rabbit::rotate() {
+    float angle = carrotAngle();
+    angleY =-angleY+angle+std::numbers::pi;
 }
 
 float Rabbit::carrotDistance()

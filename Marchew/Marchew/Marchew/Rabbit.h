@@ -19,8 +19,7 @@ public:
 	void runToCarrot();
 	void runForward();
 	Carrot* carrot;
-	float angleY;
-	void rotateRabbit(ShaderProgram& phong);
+	void rotate();
 
 private:
 	float carrotDistance();

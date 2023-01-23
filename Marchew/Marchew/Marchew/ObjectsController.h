@@ -27,7 +27,7 @@ public:
 	void carrotsGrowing(float elapsed);
 	void killNearRabbit(glm::vec3 currentPosition);
 	void eatCarrot();
-	void runToCarrot(ShaderProgram& phong);
+	void runToCarrot();
 private:
 	std::vector<Object*> allObjecjtsInGame;
 	std::vector<Bed*> beds;

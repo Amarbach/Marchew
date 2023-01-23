@@ -313,7 +313,7 @@ int main()
         {
             objectController.eatCarrot();
             objectController.drawRabbits(phong);
-            objectController.runToCarrot(phong);
+            objectController.runToCarrot();
             objectController.killNearRabbit(mainCamera.getPosition());
         }
         //sun

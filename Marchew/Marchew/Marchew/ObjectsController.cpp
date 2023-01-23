@@ -134,7 +134,7 @@ void ObjectsController::carrotsGrowing(float elapsed)
 	}
 }
 
-void ObjectsController::runToCarrot(ShaderProgram& phong)
+void ObjectsController::runToCarrot()
 {
 	Rabbit* rabbit;
 	float dist;
@@ -152,8 +152,9 @@ void ObjectsController::runToCarrot(ShaderProgram& phong)
 		{
 			int carrotIndex = rand() % carrots.size();
 			rabbit->carrot = carrots[carrotIndex];
-			rabbit->rotateRabbit(phong);
 			rabbit->runToCarrot();
+			rabbit->rotate();
+			
 		}
 	}
 }
