@@ -3,6 +3,10 @@
 #include "Carrot.h"
 #include "Rabbit.h"
 #include <vector>
+#include"Bed.h"
+#include <cmath>
+#include <stdlib.h>
+#include <numbers> 
 
 class Bed;
 
@@ -21,14 +25,14 @@ public:
 	void spawnRabbits(int quant);
 	Bed* findNearestBed(glm::vec3 currentPosition);
 	void carrotsGrowing(float elapsed);
-	void KillNearRabbit(glm::vec3 currentPosition);
-	void EatCarrot();
-	void runToCarrot(float elapsed);
+	void killNearRabbit(glm::vec3 currentPosition);
+	void eatCarrot();
+	void runToCarrot(ShaderProgram& phong);
 private:
 	std::vector<Object*> allObjecjtsInGame;
 	std::vector<Bed*> beds;
 	std::vector<Carrot*> carrots;
 	std::vector<Rabbit*> rabbits;
-	float CalculateDistance(glm::vec3 p1, glm::vec3 p2);
+	float calculateDistance(glm::vec3 p1, glm::vec3 p2);
 };
 

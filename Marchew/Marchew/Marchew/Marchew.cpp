@@ -311,10 +311,10 @@ int main()
         //sunTex.UseOn(GL_TEXTURE1);
         if (!cycle.isDay())
         {
-            objectController.EatCarrot();
+            objectController.eatCarrot();
             objectController.drawRabbits(phong);
-            objectController.runToCarrot(1.f);
-            objectController.KillNearRabbit(mainCamera.getPosition());
+            objectController.runToCarrot(phong);
+            objectController.killNearRabbit(mainCamera.getPosition());
         }
         //sun
         shaderSun.use();

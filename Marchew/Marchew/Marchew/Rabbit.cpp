@@ -1,36 +1,34 @@
 #include "Rabbit.h"
-#include "Texture.h"
-#include "Model.h"
 
 
 Rabbit::Rabbit()
 {
     model = new Model("3Ds\\Bunny.obj");
 
-    texture = new Texture("carrot_tex.png");
+    texture = new Texture("rabbit-fur.jpg");
     texture->Load();
 
     position = glm::vec3(0.0f, 0.0f, 0.0f);
-    scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    scale = glm::vec3(0.6f, 0.6f, 0.6f);
     carrot = nullptr;
     speed = 0.01;
+    angleY = 0;
 }
 
-Rabbit::Rabbit(glm::vec3 _positon, float _angleY) : Rabbit()
+Rabbit::Rabbit(glm::vec3 _positon) : Rabbit()
 {
     position = _positon;
-    angleY = _angleY;
 }
 
 void Rabbit::init()
 {
 }
 
+
 void Rabbit::draw(ShaderProgram& phong){
 
     glm::mat4 transform = glm::mat4(1.0f);
     transform = glm::translate(transform, position);
-    transform = glm::rotate(transform, angleY, glm::vec3(0,1,0));
     transform = glm::scale(transform, scale);
     phong.setMat4("model", transform);
     texture->UseOn(GL_TEXTURE0);
@@ -44,20 +42,32 @@ void Rabbit::runToCarrot()
     
     float distX = carrot->position.x - position.x;
     float distZ = carrot->position.z - position.z;
-    float dist = CalculateCarrotDistance();
+    float dist = carrotDistance();
     angleY = asin(distX / dist);
     position.x += speed * distX / dist;
-    position.z += speed *distZ/dist;
+    position.z += speed * distZ /dist;
 }
 
 void Rabbit::runForward()
 {
-    position.x += speed;
-    position.z += speed;
+    position.z -= speed;
+    position.x -= speed;
+}
+float::Rabbit::carrotAngle() {
+    float distX = carrot->position.x - position.x;
+    float distZ = carrot->position.z - position.z;
+    return atan(tan(distX / distZ));
+}
+void::Rabbit::rotateRabbit(ShaderProgram& phong) {
+    float angle = carrotAngle();
+    glm::mat4 transform = glm::mat4(1.0f);
+    transform = glm::rotate(transform, angle-angleY, glm::vec3(0, 1, 0));
+    phong.setMat4("model", transform);
+
+    angleY = angle;
 }
 
-
-float Rabbit::CalculateCarrotDistance()
+float Rabbit::carrotDistance()
 {
     if (carrot == nullptr)
         return 1;
