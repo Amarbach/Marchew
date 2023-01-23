@@ -277,7 +277,7 @@ int main()
 
         //wrzucenie tekstur na jednostki teksturowe
       
-        glm::vec3 lightColor = glm::vec3(1.0, 1.0, 1.0) * cycle.getSunlightIntensity();
+        glm::vec3 lightColor = cycle.getLightColor();
         
         //włączenie shadera i przekazanie macierzy projekcji, koloru światła, pozycji światła i pozycji obserwatora
         phong.use();
@@ -306,8 +306,19 @@ int main()
         phong.setMat4("model", glm::mat4(1.0f));
         ground.Draw();
 
+
+        //sunTex.UseOn(GL_TEXTURE0); nie ma znaczenia niestety dla tego shadera
+        //sunTex.UseOn(GL_TEXTURE1);
+        if (!cycle.isDay())
+        {
+            objectController.EatCarrot();
+            objectController.drawRabbits(phong);
+            objectController.runToCarrot(1.f);
+            objectController.KillNearRabbit(mainCamera.getPosition());
+        }
         //sun
         shaderSun.use();
+        shaderSun.setVec3("color", lightColor);
         shaderSun.setMat4("projection", mainCamera.getProjectionMtx());
         shaderSun.setMat4("view", mainCamera.getViewMtx());
        
@@ -315,17 +326,8 @@ int main()
         transform = glm::translate(transform, lightPos);
         transform = glm::scale(transform, glm::vec3(0.005f, 0.005f, 0.005f));
         shaderSun.setMat4("model", transform);
+        sun.Draw();
 
-        sunTex.UseOn(GL_TEXTURE0);
-        sunTex.UseOn(GL_TEXTURE1);
-        if (cycle.isDay()) sun.Draw();
-        else
-        {
-            objectController.EatCarrot();
-            objectController.drawRabbits(phong);
-            objectController.runToCarrot(1.f);
-            objectController.KillNearRabbit(mainCamera.getPosition());
-        }
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

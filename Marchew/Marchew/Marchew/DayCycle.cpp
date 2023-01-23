@@ -28,22 +28,34 @@ void DayCycle::setSunset(float sunset)
 {
 	this->sunset = sunset * 3600.0f;
 }
-void DayCycle::update(float elapsed) 
+void DayCycle::update(float elapsed)
 {
 	daySecond += elapsed * timeScale;
 	if (daySecond > dayLength) daySecond = 0.0f;
 }
 glm::vec3 DayCycle::getSunDirection()
 {
-	return glm::vec3(cos((daySecond - (dayLength / 4.0f)) / (dayLength) * 2 * M_PI), sin((daySecond - (dayLength / 4.0f)) / (dayLength) * 2 * M_PI), 0.0f);
+	glm::vec3 ret = glm::vec3(cos((daySecond - (dayLength / 4.0f)) / (dayLength) * 2 * M_PI), sin((daySecond - (dayLength / 4.0f)) / (dayLength) * 2 * M_PI), 0.0f);
+	if (this->isDay()) return ret;
+	else return -ret;
 }
 bool DayCycle::isDay() 
 {
 	return (daySecond > sunrise && daySecond < sunset);
 }
-float DayCycle::getSunlightIntensity()
+glm::vec3 DayCycle::getLightColor()
 {
-	float ret = 0.3f;
-	if (this->isDay()) ret += 0.7f * (float)(((sin((daySecond - sunrise) / (sunset - sunrise) * M_PI)) + 1.0f) / 2.0f);
+	glm::vec3 ret;
+	float intensity = 0.3f;
+	if (this->isDay())
+	{
+		intensity += 0.7f * (float)(((sin((daySecond - sunrise) / (sunset - sunrise) * M_PI)) + 1.0f) / 2.0f);
+		ret = glm::vec3(1.0f, 1.0f, 1.0f) * intensity;
+	}
+	else 
+	{
+		intensity += 0.145f;
+		ret = glm::vec3(0.95f, 0.95f, 1.0f) * intensity;
+	}
 	return ret;
 }
