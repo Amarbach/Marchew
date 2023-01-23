@@ -310,12 +310,7 @@ int main()
         //sunTex.UseOn(GL_TEXTURE0); nie ma znaczenia niestety dla tego shadera
         //sunTex.UseOn(GL_TEXTURE1);
         if (!cycle.isDay())
-        {
-            objectController.eatCarrot();
-            objectController.drawRabbits(phong);
-            objectController.runToCarrot();
-            objectController.killNearRabbit(mainCamera.getPosition());
-        }
+            objectController.handleRabbits(mainCamera.getPosition(), phong);
         //sun
         shaderSun.use();
         shaderSun.setVec3("color", lightColor);

@@ -24,11 +24,6 @@ void ObjectsController::addBed(Bed* bed)
 	beds.push_back(bed);
 }
 
-void ObjectsController::addRabbit(Rabbit* rabbit)
-{
-	rabbits.push_back(rabbit);
-}
-
 
 void ObjectsController::addCarrot(Carrot* carrot)
 {
@@ -88,6 +83,32 @@ Bed* ObjectsController::findNearestBed(glm::vec3 currentPosition)
 
 	return nullptr;
 }
+
+float ObjectsController::calculateDistance(glm::vec3 p1, glm::vec3 p2)
+{
+	float distance = sqrt((p1.x - p2.x) * (p1.x - p2.x)
+		+ (p1.y - p2.y) * (p1.y - p2.y)
+		+ (p1.z - p2.z) * (p1.z - p2.z));
+
+	return distance;
+}
+
+void ObjectsController::carrotsGrowing(float elapsed)
+{
+	for (int i = 0; i < carrots.size(); i++)
+	{
+		carrots[i]->grow(elapsed);
+	}
+}
+
+void ObjectsController::handleRabbits(glm::vec3 currentPosition, ShaderProgram& phong){
+	eatCarrot();
+	drawRabbits(phong);
+	rabbitRun();
+	killNearRabbit(currentPosition);
+	reSpawnRabbits();
+}
+
 void ObjectsController::killNearRabbit(glm::vec3 currentPosition)
 {
 	float minDistance = 4.f;
@@ -117,24 +138,7 @@ void ObjectsController::eatCarrot()
 	}
 }
 
-float ObjectsController::calculateDistance(glm::vec3 p1, glm::vec3 p2)
-{
-	float distance = sqrt((p1.x - p2.x) * (p1.x - p2.x)
-		+ (p1.y - p2.y) * (p1.y - p2.y)
-		+ (p1.z - p2.z) * (p1.z - p2.z));
-
-	return distance;
-}
-
-void ObjectsController::carrotsGrowing(float elapsed)
-{
-	for (int i = 0; i < carrots.size(); i++)
-	{
-		carrots[i]->grow(elapsed);
-	}
-}
-
-void ObjectsController::runToCarrot()
+void ObjectsController::rabbitRun()
 {
 	Rabbit* rabbit;
 	float dist;
@@ -158,10 +162,14 @@ void ObjectsController::runToCarrot()
 		}
 	}
 }
+void ObjectsController::reSpawnRabbits() {
+	if (rabbits.size() < 5)
+		spawnRabbits(4);
+}
 
 void ObjectsController::spawnRabbits(int quant)
 {
-	quant = quant / 4;
+	quant /= 4;
 	int x[2] = { 0, 18 };
 	int z[2] = { -3, 34 };
 	float y = -2.4f;

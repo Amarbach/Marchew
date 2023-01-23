@@ -30,6 +30,7 @@ void Rabbit::draw(ShaderProgram& phong){
     glm::mat4 transform = glm::mat4(1.0f);
     transform = glm::translate(transform, position);
     transform = glm::scale(transform, scale); transform = glm::rotate(transform, angleY, glm::vec3(0, 1, 0));
+    //transform = glm::scale(transform, scale); transform = glm::rotate(transform, (float)std::numbers::pi, glm::vec3(0, 1, 0));
     phong.setMat4("model", transform);
     phong.setMat4("model", transform);
     texture->UseOn(GL_TEXTURE0);
@@ -52,18 +53,18 @@ void Rabbit::runForward()
 {
     position.z -= speed*1.5;
     position.x -= speed*1.5;
-    angleY = 0;
+    angleY = std::numbers::pi/4;
 }
 
 float::Rabbit::carrotAngle() {
     float distX = position.x -carrot->position.x;
-    float distZ = position.z-carrot->position.z;
+    float distZ = position.z - carrot->position.z;
     return atan(distX / distZ);
 }
 
 void::Rabbit::rotate() {
     float angle = carrotAngle();
-    angleY =-angleY+angle+std::numbers::pi;
+    angleY =angle+std::numbers::pi;
 }
 
 float Rabbit::carrotDistance()
