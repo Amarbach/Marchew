@@ -21,15 +21,17 @@ public:
 	void removeCarrot(Carrot* carrot);
 	Bed* findNearestBed(glm::vec3 currentPosition);
 	void drawObjects(ShaderProgram& phong);
-	void handleRabbits(glm::vec3 currentPosition, ShaderProgram& phong);
-	void drawRabbits(ShaderProgram& phong);
-	void spawnRabbits(int quant);
-	void reSpawnRabbits();
 	void carrotsGrowing(float elapsed);
+
+	void handleRabbits(glm::vec3 currentPosition, ShaderProgram& phong);
+	void spawnRabbits(int quant);
+	
+private:
+	void reSpawnRabbits();
 	void killNearRabbit(glm::vec3 currentPosition);
 	void eatCarrot();
 	void rabbitRun();
-private:
+	void drawRabbits(ShaderProgram& phong);
 	std::vector<Object*> allObjecjtsInGame;
 	std::vector<Bed*> beds;
 	std::vector<Carrot*> carrots;
