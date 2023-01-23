@@ -20,6 +20,6 @@ public:
 	void update(float);
 	glm::vec3 getSunDirection();
 	bool isDay();
-	float getSunlightIntensity();
+	glm::vec3 getLightColor();
 };
 
