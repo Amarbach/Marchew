@@ -59,12 +59,17 @@ void Rabbit::runForward()
 float::Rabbit::carrotAngle() {
     float distX = position.x -carrot->position.x;
     float distZ = position.z - carrot->position.z;
+    float angle = atan(distX / distZ);
+    if (position.z<carrot->position.z)
+        angle += std::numbers::pi;
+    return angle;
     return atan(distX / distZ);
 }
 
 void::Rabbit::rotate() {
     float angle = carrotAngle();
-    angleY =angle+std::numbers::pi;
+    angleY = angle;
+
 }
 
 float Rabbit::carrotDistance()
